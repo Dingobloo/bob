@@ -30,16 +30,8 @@
 # $ ./foo
 # STUFF
 
-set -e
-
-tmp_c=$(mktemp /tmp/bob-XXXXX.c)
-tmp_exe=${tmp_c%.c}
-
-exec 3>$tmp_c
-rm $tmp_c
-
 bob_c=$(cat <<END
-#line 42 "bob"
+#line 34 "bob"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -194,6 +186,14 @@ int main(int argc, char **argv) {
 
 END
 )
+
+set -e
+
+tmp_c=$(mktemp /tmp/bob-XXXXX.c)
+tmp_exe=${tmp_c%.c}
+
+exec 3>$tmp_c
+rm $tmp_c
 
 echo "$bob_c" >&$tmp_c
 echo "#line 0 \"$1.bob\"" >>$tmp_c
