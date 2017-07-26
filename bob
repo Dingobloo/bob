@@ -189,6 +189,12 @@ END
 
 set -e
 
+function cleanup {
+    rm -f $tmp_c $tmp_exe
+}
+
+trap cleanup EXIT
+
 tmp_c=$(mktemp /tmp/bob-XXXXX.c)
 tmp_exe=${tmp_c%.c}
 
@@ -199,6 +205,3 @@ cat $1.bob >>$tmp_c
 gcc -o $tmp_exe $tmp_c
 
 eval $tmp_exe
-
-rm $tmp_c
-rm $tmp_exe
