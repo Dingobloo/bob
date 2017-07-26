@@ -1,9 +1,9 @@
 #!/bin/bash
-
+#
 # This is a sketch of an experimental design for a build system where project definitions are written in C.
 # The build system is packaged as a single shell script which contains the C library code as a heredoc string.
 # The shell script creates a concatenation from the library code and the file specified as the first command line argument.
-# Then that is compiled with the system's C compiler. The result file is run, which executes the required build actions.
+# Then that is compiled with the system's C compiled and executed.
 #
 # Note that using some tricks you can write a single file that is both a valid Unix shell script and Windows batch file,
 # which combined with cross-platform code for the C library would allow a portable single-file build system solution.
@@ -39,7 +39,7 @@ exec 3>$tmp_c
 rm $tmp_c
 
 bob_c=$(cat <<END
-#line 12 "bob.sh"
+#line 42 "bob.sh"
 
 #include <stdarg.h>
 #include <stdio.h>
