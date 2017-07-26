@@ -23,9 +23,9 @@
 # Command line transcript:
 # 
 # $ ./bob foo
-# PROJECT: foo
-# INFO:    Compiling C executable 'foo'
-# COMMAND: gcc -o foo bar.c baz.c
+# [PROJECT] foo
+#           Compiling C executable 'foo'
+# [COMMAND] gcc -o foo bar.c baz.c
 #
 # $ ./foo
 # STUFF
@@ -51,8 +51,7 @@ char *strf(char *fmt, ...) {
 }
 
 void vmsg(char *kind, char *fmt, va_list args) {
-    int padding = strlen(kind) <= 7 ? 7 - strlen(kind) : 0;
-    printf("%s: %*s", kind, padding, "");
+    printf("%s%*s", kind, (int)(strlen(kind) <= 10 ? 10 - strlen(kind) : 1), "");
     vprintf(fmt, args);
     printf("\n");
 }
@@ -67,7 +66,7 @@ void msg(char *kind, char *fmt, ...) {
 void error(char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    vmsg("ERROR", fmt, args);
+    vmsg("[ERROR]", fmt, args);
     va_end(args);
     exit(1);
 }
@@ -75,12 +74,12 @@ void error(char *fmt, ...) {
 void info(char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    vmsg("INFO", fmt, args);
+    vmsg("", fmt, args);
     va_end(args);
 }
 
 int run(char *str) {
-    msg("COMMAND", "%s", str);
+    msg("[COMMAND]", "%s", str);
     return system(str);
 }
 
@@ -142,7 +141,7 @@ void project_init(project_t *project) {
 
 void project_build(project_t *project) {
     if (project->type == NONE) error("Trying to build project '%s' with no type selected.", project->name);
-    msg("PROJECT", "%s", project->name);
+    msg("[PROJECT]", "%s", project->name);
     if (project->type == C_EXECUTABLE) {
         info("Compiling C executable '%s'", project->name);
         if (project->sources.num_files == 0) error("No source files specified.");
