@@ -90,7 +90,7 @@ int run(char *str) {
 }
 
 typedef struct {
-    void *data;
+    char *data;
     size_t num_items;
     size_t max_items;
 } array_t;
