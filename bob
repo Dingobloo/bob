@@ -40,7 +40,7 @@ exec 3>$tmp_c
 rm $tmp_c
 
 bob_c=$(cat <<END
-#line 43 "bob.sh"
+#line 43 "bob"
 
 #include <stdarg.h>
 #include <stdio.h>
