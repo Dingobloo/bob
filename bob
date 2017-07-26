@@ -23,7 +23,7 @@
 #
 # Command line transcript:
 # 
-# $ ./bob.sh foo
+# $ ./bob foo
 # PROJECT: foo
 # INFO:    Compiling C executable 'foo'
 # COMMAND: gcc -o foo bar.c baz.c
