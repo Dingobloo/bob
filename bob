@@ -42,14 +42,17 @@ char *strf(char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
     size_t size = vsnprintf(NULL, 0, fmt, args) + 1;
+    va_end(args);
     char *str = malloc(size);
+    va_start(args, fmt);
     vsnprintf(str, size, fmt, args);
     va_end(args);
     return str;
 }
 
 void vmsg(char *kind, char *fmt, va_list args) {
-    printf("%s: %*s", kind, strlen(kind) <= 7 ? 7 - strlen(kind) : 0, "");
+    int padding = strlen(kind) <= 7 ? 7 - strlen(kind) : 0;
+    printf("%s: %*s", kind, padding, "");
     vprintf(fmt, args);
     printf("\n");
 }
@@ -202,6 +205,6 @@ echo "$bob_c" >&$tmp_c
 echo "#line 0 \"$1.bob\"" >>$tmp_c
 cat $1.bob >>$tmp_c
 
-gcc -o $tmp_exe $tmp_c
+gcc -std=c99 -o $tmp_exe $tmp_c
 
 eval $tmp_exe
