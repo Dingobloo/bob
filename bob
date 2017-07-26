@@ -17,8 +17,7 @@
 #
 # void setup() {
 #     c_executable("foo");
-#     source("bar.c");
-#     source("baz.c");
+#     sources("bar.c", "baz.c");
 # }
 #
 # Command line transcript:
@@ -40,7 +39,7 @@ exec 3>$tmp_c
 rm $tmp_c
 
 bob_c=$(cat <<END
-#line 43 "bob"
+#line 42 "bob"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -173,6 +172,18 @@ void c_executable(char *name) {
 void source(char *file) {
     file_list_add(&this_project->sources, file);
 }
+
+void sources_func(char *file, ...) {
+    va_list args;
+    va_start(args, file);
+    while (file) {
+        source(file);
+        file = va_arg(args, char *);
+    }
+    va_end(args);
+}
+
+#define sources(...) sources_func(__VA_ARGS__, NULL)
 
 void setup();
 
