@@ -242,25 +242,23 @@ set tmp_exe=%TEMP%\bob-exe.%random%.exe
 set vswhere_path="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\"
 
 pushd %CD%
-cd %vswhere_path%
+    cd %vswhere_path%
 
-for /f "usebackq delims=" %%i in (`vswhere.exe -latest -property installationPath`) do (
-	set vcpath=%%i
-)
+    for /f "usebackq delims=" %%i in (`vswhere.exe -latest -property installationPath`) do (
+        set vcpath=%%i
+    )
+popd
 
-popd 
 echo Found VC: %vcpath%
 
-	::Work around the fact that VC 2017 vcvarsall is an alias for the Dev command prompt and messes with working directory
-	pushd %CD%
-		call "%vcpath%\VC\Auxiliary\Build\vcvarsall.bat" x64 >nul 2>&1
+::Work around the fact that VC 2017 vcvarsall is an alias for the Dev command prompt and messes with working directory
+pushd %CD%
+    call "%vcpath%\VC\Auxiliary\Build\vcvarsall.bat" x64 >nul 2>&1
 
-		if %errorlevel% NEQ 0 echo Problem configuring VC environment
-	popd
+    if %errorlevel% NEQ 0 echo Problem configuring VC environment
+popd
 
-	echo calling compiler
-
-cl /Tc %tmp_c% /Fe%tmp_exe% /nologo -Zi
+cl /Tc %tmp_c% /Fe%tmp_exe% /nologo
 
 %tmp_exe%
 
