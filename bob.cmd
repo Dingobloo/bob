@@ -237,7 +237,7 @@ set tmp_exe=%TEMP%\bob-exe.%random%.exe
 ::Use vswhere to get latest installed visual studio directory
 
 set vswhere_path="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\"
-echo %vswhere_path%
+
 pushd %CD%
 
     cd /d %vswhere_path%
