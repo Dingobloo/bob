@@ -52,7 +52,7 @@ set tmp_c=%TEMP%\bob-c.%random%
 
 :<<<\
 call :heredoc bobc %tmp_c% && goto END &:; bob_c=$(cat <<:END
-#line 55 "bobdirty.cmd"
+#line 55 "bob.cmd"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -180,11 +180,6 @@ void sources_func(char *file, ...) {
 #define sources(...) sources_func(__VA_ARGS__, NULL)
 void setup();
 int main(int argc, char **argv) {
-    int a;
-    printf("Press any key when debugger is attached: ");
-
-    scanf("%d",&a);
-
     project_t default_project;
     project_init(&default_project);
     this_project = &default_project;
@@ -218,11 +213,6 @@ echo Creating Temp C file
 #also has no --suffix option, Randomising the extension and telling gcc it's a c file was simplest work around.
 tmp_c=$(mktemp /tmp/bob-c.XXXXX)
 
-echo "$tmp_c"
-
-echo Naming Executable
-#tmp_exe=${tmp_c%.c}
-
 #Due to the above suffix issues with OSX mktemp we can't base the exe name on the c file
 tmp_exe=$(mktemp /tmp/bob-exe.XXXXX)
 
@@ -230,7 +220,7 @@ echo "$bob_c" >&$tmp_c
 echo "#line 0 \"$1.bob\"" >>$tmp_c
 cat $1.bob >>$tmp_c
 
-gcc -std=c99 -ggdb -o $tmp_exe -x c $tmp_c
+gcc -std=c99 -o $tmp_exe -x c $tmp_c
 
 eval $tmp_exe
 
@@ -246,8 +236,6 @@ echo #line 0 "%1.bob" >>%tmp_c%
 type %1.bob >>%tmp_c%
 
 set tmp_exe=%TEMP%\bob-exe.%random%.exe
-
-::gcc -std=c99 -o %tmp_exe% -x c %tmp_c%
 
 ::Use vswhere to get latest installed visual studio directory
 
@@ -265,13 +253,6 @@ echo Found VC: %vcpath%
 
 	::Work around the fact that VC 2017 vcvarsall is an alias for the Dev command prompt and messes with working directory
 	pushd %CD%
-
-		::call "D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
-
-		::call "I:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" 
-
-		::call "I:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 >nul 2>&1
-		
 		call "%vcpath%\VC\Auxiliary\Build\vcvarsall.bat" x64 >nul 2>&1
 
 		if %errorlevel% NEQ 0 echo Problem configuring VC environment
@@ -280,8 +261,6 @@ echo Found VC: %vcpath%
 	echo calling compiler
 
 cl /Tc %tmp_c% /Fe%tmp_exe% /nologo -Zi
-
-echo %tmp_exe%
 
 %tmp_exe%
 
