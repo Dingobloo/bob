@@ -201,13 +201,10 @@ goto CMDSCRIPT
 set -e
 
 function cleanup {
-  echo Removing temp files
   rm -f $tmp_c $tmp_exe
 }
 
 trap cleanup EXIT
-
-echo Creating Temp C file
 
 #OSX mktemp (At least as of 10.10.5 Yosemite) fails to substitute if the file template also has an extension
 #also has no --suffix option, Randomising the extension and telling gcc it's a c file was simplest work around.
