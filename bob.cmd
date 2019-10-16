@@ -790,7 +790,7 @@ set tmp_exe=%TEMP%\bob-exe.%random%.exe
 set vswhere_path="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\"
 
     set PATH=%PATH%;%vswhere_path%
-    set PATH=%PATH%;%ProgramData%\chocolatey\bin
+    set PATH=%PATH%;"%ProgramData%\chocolatey\bin"
 
 
 pushd %CD%
