@@ -8,6 +8,6 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install vswhere --pre      ; fi
 
 script: 
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then powershell ./bob.cmd 
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then powershell "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then powershell 
+  - ./bob.cmd 
 #  else ./bob.cmd
