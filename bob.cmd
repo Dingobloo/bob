@@ -789,9 +789,14 @@ set tmp_exe=%TEMP%\bob-exe.%random%.exe
 
 set vswhere_path="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\"
 
+    set PATH=%PATH%;%vswhere_path%
+    set PATH=%PATH%;%ProgramData%\chocolatey\bin
+
+
 pushd %CD%
 
-    cd /d %vswhere_path%
+    ::cd /d %vswhere_path%
+
 
     for /f "usebackq delims=" %%i in (`vswhere.exe -latest -property installationPath`) do (
         set vcpath=%%i
