@@ -1,7 +1,7 @@
 language: cpp
 os:
-  - linux
-  - osx
+#  - linux
+#  - osx
   - windows 
   
 before_install:
@@ -9,4 +9,5 @@ before_install:
 
 script: 
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then powershell ./bob.cmd 
-  else ./bob.cmd
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then powershell ./bob.cmd 
+#  else ./bob.cmd
