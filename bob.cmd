@@ -787,10 +787,10 @@ set tmp_exe=%TEMP%\bob-exe.%random%.exe
 
 ::Use vswhere to get latest installed visual studio directory
 
-set vswhere_path="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\"
-
+    set vswhere_path=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\
     set PATH=%PATH%;%vswhere_path%
-    set PATH=%PATH%;"%ProgramData%\chocolatey\bin"
+    set choco_path=%SystemDrive%\Chocolatey\bin\
+    set PATH=%PATH%;%choco_path%
 
 
 pushd %CD%
@@ -804,9 +804,9 @@ pushd %CD%
 popd
 
 echo Found VC: %vcpath%
-
 ::Work around the fact that VC 2017 vcvarsall is an alias for the Dev command prompt and messes with working directory
 pushd %CD%
+echo %vcpath%
     call "%vcpath%\VC\Auxiliary\Build\vcvarsall.bat" x64 >nul 2>&1
 
     if %errorlevel% NEQ 0 echo Problem configuring VC environment
