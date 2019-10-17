@@ -798,7 +798,7 @@ pushd %CD%
     ::cd /d %vswhere_path%
 
 
-    for /f "usebackq delims=" %%i in (`vswhere.exe -latest -property installationPath`) do (
+    for /f "usebackq delims=" %%i in (`vswhere.exe -products * -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do (
         set vcpath=%%i
     )
 popd
