@@ -1,0 +1,4 @@
+void setup() {
+  c_executable("foo");
+  sources("bar.c", "baz.c");
+}
