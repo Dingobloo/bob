@@ -9,6 +9,6 @@ before_install:
 
 script: 
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then powershell -c './bob.cmd build' ;fi
-  - foo
+  - ./foo
   #- powershell -C '&"${Env:ProgramData}\chocolatey\bin\vswhere.exe"-products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath'
 #  else ./bob.cmd
