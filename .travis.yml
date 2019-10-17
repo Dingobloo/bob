@@ -9,5 +9,5 @@ before_install:
 
 script: 
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then powershell -c './bob.cmd' ;fi
-  - powershell -C '${Env:ProgramData}\chocolatey\bin\vswhere.exe'
+  - powershell -C '&"${Env:ProgramData}\chocolatey\bin\vswhere.exe"'
 #  else ./bob.cmd
