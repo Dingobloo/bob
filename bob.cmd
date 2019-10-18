@@ -806,7 +806,6 @@ popd
 echo Found VC: %vcpath%
 ::Work around the fact that VC 2017 vcvarsall is an alias for the Dev command prompt and messes with working directory
 pushd %CD%
-echo %vcpath%
     call "%vcpath%\VC\Auxiliary\Build\vcvarsall.bat" x64 >nul 2>&1
 
     if %errorlevel% NEQ 0 echo Problem configuring VC environment
