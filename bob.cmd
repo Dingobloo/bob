@@ -239,12 +239,8 @@ cat $tmp_c>>"bob.log"
 
 echo "Building with: "$compiler
 
-eval "$compiler -std=c99 -o $tmp_exe -x c $tmp_c"
+eval "$compiler -std=c99 -o $tmp_exe -x c $tmp_c" ||{ echo "[ERROR]   Bootstrap Compilation failed!"; exit 1; }
 
-if [ $? -ne 0 ]; then
-    echo "[ERROR]   Bootstrap Compilation failed!"
-    exit 1
-fi
 eval $tmp_exe ${@}
 
 exit 0
@@ -302,7 +298,7 @@ popd
         exit /b 1   
     )
 
-    %tmp_exe%
+    %tmp_exe% %*
 
     del %tmp_c%
     del %tmp_exe%
