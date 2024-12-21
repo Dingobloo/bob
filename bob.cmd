@@ -214,7 +214,7 @@ function findCCompiler() {
     elif type clang > /dev/null ; then
         echo "clang"
     else
-        printf >&2 "ERROR: Unable to locate suitable bootstrapping compiler.\n Are gcc or clang in PATH?\n";
+        printf >&2 "[ERROR]   Unable to locate suitable bootstrapping compiler.\n Are gcc or clang in PATH?\n";
         exit 1;
     fi
 }
@@ -241,6 +241,10 @@ echo "Building with: "$compiler
 
 eval "$compiler -std=c99 -o $tmp_exe -x c $tmp_c"
 
+if [ $? -ne 0 ]; then
+    echo "[ERROR]   Bootstrap Compilation failed!"
+    exit 1
+fi
 eval $tmp_exe ${@}
 
 exit 0
@@ -286,12 +290,17 @@ set compiler=cl
 pushd %CD%
     call "%vcpath%\VC\Auxiliary\Build\vcvarsall.bat" x64 >nul 2>&1
 
-    if %errorlevel% NEQ 0 echo Problem configuring VC environment
+    if %errorlevel% NEQ 0 echo [ERROR]   Problem configuring VC environment, unable to successfully run vcvarsall
 popd
 
     :COMPILE
 
     %compiler% /Tc %tmp_c% /Fe%tmp_exe% /nologo
+
+    if %errorlevel% NEQ 0 (
+        echo [ERROR]   Bootstrap Compilation failed!
+        exit /b 1   
+    )
 
     %tmp_exe%
 
