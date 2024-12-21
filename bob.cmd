@@ -227,7 +227,7 @@ trap cleanup EXIT
 tmp_c=$(mktemp bob-c.XXXXXX)
 
 #Due to the above suffix issues with OSX mktemp we can't base the exe name on the c file
-tmp_exe=$(mktemp bob-exe.XXXXXX)
+tmp_exe=$(mktemp /tmp/bob-exe.XXXXXX)
 
 echo "$bob_c" >&$tmp_c
 echo "#line 0 \"$1.bob\"" >>$tmp_c
