@@ -51,7 +51,7 @@ set tmp_c=%TEMP%\bob-c.%random%
 
 : '
 call :heredoc bobc %tmp_c% && goto END &:'; bob_c=$(cat <<:END
-#line 1 "bob.c"
+#line 55 "bob.cmd"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -132,19 +132,37 @@ void file_list_init(file_list_t *file_list) {
 void file_list_add(file_list_t *file_list, char *filename) {
     array_add(&file_list->files_array, &filename, sizeof(char *));
 }
+typedef struct {
+    union {
+        struct {
+            char **buildcommands;
+            size_t num_buildcommands;
+        };
+        array_t buildcommands_array;
+    };
+} buildcommand_list_t;
+void buildcommand_list_init(buildcommand_list_t *buildcommand_list) {
+    array_init(&buildcommand_list->buildcommands_array, sizeof(char *));
+}
+void buildcommand_list_add(buildcommand_list_t *buildcommand_list, char *buildcommandname) {
+    array_add(&buildcommand_list->buildcommands_array, &buildcommandname, sizeof(char *));
+}
 enum {
     NONE,
-    C_EXECUTABLE
+    C_EXECUTABLE,
+    WASM_MODULE
 };
 typedef struct {
     int type;
     char *name;
     file_list_t sources;
+    buildcommand_list_t buildcommands;
 } project_t;
 void project_init(project_t *project) {
     project->type = NONE;
     project->name = "<unnamed>";
     file_list_init(&project->sources);
+    buildcommand_list_init(&project->buildcommands);
 }
 void project_build(project_t *project) {
     if (project->type == NONE) error("Trying to build project '%s' with no type selected.", project->name);
@@ -152,7 +170,9 @@ void project_build(project_t *project) {
     if (project->type == C_EXECUTABLE) {
         info("Compiling C executable '%s'", project->name);
         if (project->sources.num_files == 0) error("No source files specified.");
-        char *cmd = strf("gcc -o %s", project->name);
+        char *cmd = strf("clang -o %s", project->name);
+        for (size_t i = 0; i < project->buildcommands.num_buildcommands; i++)
+            cmd = strf("%s %s", cmd, project->buildcommands.buildcommands[i]);
         for (size_t i = 0; i < project->sources.num_files; i++)
             cmd = strf("%s %s", cmd, project->sources.files[i]);
         // Uses iso646.h to avoid the not equal operator which interferes with CMD delayed expansion
@@ -176,7 +196,24 @@ void sources_func(char *file, ...) {
     }
     va_end(args);
 }
+
 #define sources(...) sources_func(__VA_ARGS__, NULL)
+
+void buildcommand(char *command) {
+    buildcommand_list_add(&this_project->buildcommands, command);
+}
+void buildcommands_func(char *command, ...) {
+    va_list args;
+    va_start(args, command);
+    while (command) {
+        buildcommand(command);
+        command = va_arg(args, char *);
+    }
+    va_end(args);
+}
+
+#define buildcommands(...) buildcommands_func(__VA_ARGS__, NULL)
+
 void setup();
 
 int main(int argc, char **argv) {

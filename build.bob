@@ -1,4 +1,6 @@
 void setup() {
   c_executable("foo");
+  buildcommands("-Wall", "-Werror");
   sources("bar.c", "baz.c");
+  
 }
