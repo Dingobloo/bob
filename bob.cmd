@@ -109,6 +109,9 @@ void array_init(array_t *array, size_t item_size) {
     array->max_items = 16;
     array->data = malloc(array->max_items * item_size);
 }
+void array_reset (array_t *array){
+    array->num_items = 0;
+}
 void array_add(array_t *array, void *item_ptr, size_t item_size) {
     if (array->num_items == array->max_items) {
         array->max_items *= 2;
@@ -147,8 +150,24 @@ void buildcommand_list_init(buildcommand_list_t *buildcommand_list) {
 void buildcommand_list_add(buildcommand_list_t *buildcommand_list, char *buildcommandname) {
     array_add(&buildcommand_list->buildcommands_array, &buildcommandname, sizeof(char *));
 }
+typedef struct {
+    union {
+        struct {
+            char **linkcommands;
+            size_t num_linkcommands;
+        };
+        array_t linkcommands_array;
+    };
+} linkcommand_list_t;
+void linkcommand_list_init(linkcommand_list_t *linkcommand_list) {
+    array_init(&linkcommand_list->linkcommands_array, sizeof(char *));
+}
+void linkcommand_list_add(linkcommand_list_t *linkcommand_list, char *linkcommandname) {
+    array_add(&linkcommand_list->linkcommands_array, &linkcommandname, sizeof(char *));
+}
 enum {
     NONE,
+    RESET,
     C_EXECUTABLE,
     WASM_MODULE
 };
@@ -157,14 +176,26 @@ typedef struct {
     char *name;
     file_list_t sources;
     buildcommand_list_t buildcommands;
+    linkcommand_list_t linkcommands;
 } project_t;
+
 void project_init(project_t *project) {
     project->type = NONE;
     project->name = "<unnamed>";
     file_list_init(&project->sources);
     buildcommand_list_init(&project->buildcommands);
+    linkcommand_list_init(&project->linkcommands);
 }
+void project_reset(project_t *project){
+    project->type = RESET;
+    project->name = "<unnamed>";
+    array_reset(&project->sources.files_array);
+    array_reset(&project->buildcommands.buildcommands_array);
+    array_reset(&project->linkcommands.linkcommands_array);
+}
+
 void project_build(project_t *project) {
+    if (project->type == RESET) return; //skip projects that have just been reset
     if (project->type == NONE) error("Trying to build project '%s' with no type selected.", project->name);
     msg("[PROJECT]", "%s", project->name);
     if (project->type == C_EXECUTABLE) {
@@ -173,6 +204,8 @@ void project_build(project_t *project) {
         char *cmd = strf("clang -o %s", project->name);
         for (size_t i = 0; i < project->buildcommands.num_buildcommands; i++)
             cmd = strf("%s %s", cmd, project->buildcommands.buildcommands[i]);
+        for (size_t i = 0; i < project->linkcommands.num_linkcommands; i++)
+            cmd = strf("%s %s", cmd, project->linkcommands.linkcommands[i]);
         for (size_t i = 0; i < project->sources.num_files; i++)
             cmd = strf("%s %s", cmd, project->sources.files[i]);
         // Uses iso646.h to avoid the not equal operator which interferes with CMD delayed expansion
@@ -180,9 +213,14 @@ void project_build(project_t *project) {
     }
 }
 project_t *this_project;
+
 void c_executable(char *name) {
     this_project->type = C_EXECUTABLE;
     this_project->name = name;
+}
+void end_project() {
+    project_build(this_project);
+    project_reset(this_project);
 }
 void source(char *file) {
     file_list_add(&this_project->sources, file);
@@ -196,7 +234,6 @@ void sources_func(char *file, ...) {
     }
     va_end(args);
 }
-
 #define sources(...) sources_func(__VA_ARGS__, NULL)
 
 void buildcommand(char *command) {
@@ -211,8 +248,21 @@ void buildcommands_func(char *command, ...) {
     }
     va_end(args);
 }
-
 #define buildcommands(...) buildcommands_func(__VA_ARGS__, NULL)
+
+void linkcommand(char *command) {
+    linkcommand_list_add(&this_project->linkcommands, command);
+}
+void linkcommands_func(char *command, ...) {
+    va_list args;
+    va_start(args, command);
+    while (command) {
+        linkcommand(command);
+        command = va_arg(args, char *);
+    }
+    va_end(args);
+}
+#define linkcommands(...) linkcommands_func(__VA_ARGS__, NULL)
 
 void setup();
 

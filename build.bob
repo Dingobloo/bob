@@ -1,6 +1,36 @@
 void setup() {
-  c_executable("foo");
-  buildcommands("-Wall", "-Werror");
-  sources("bar.c", "baz.c");
-  
+  c_executable("foo.exe");
+    /*buildcommands(
+      "-Wall", 
+      "-Werror", 
+      "-Os", 
+      "-DCLAY_WASM",
+      "-mbulk-memory",
+      "--target=wasm32"
+      "-nostdlib"                                                      
+    );
+    
+    linkcommands(                                                               
+      "-Wl,--strip-all",                                                           
+      "-Wl,--export-dynamic",                                                      
+      "-Wl,--no-entry",                                                            
+      "-Wl,--export=__heap_base",                                                  
+      "-Wl,--export=ACTIVE_RENDERER_INDEX",                                        
+      "-Wl,--initial-memory=6553600"
+    );*/
+    
+    sources("bar.c", "baz.c");
+
+  end_project();
+
+  c_executable("twoo.exe");
+    sources("bar.c", "baz.c");
+    
+    buildcommands(
+      "-Wall", 
+      "-Werror", 
+      "-Os"
+    );
+
+  end_project();
 }
